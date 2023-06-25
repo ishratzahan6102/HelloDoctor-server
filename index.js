@@ -134,7 +134,7 @@ async function run() {
         })
 
         // admin hobe naki na update kortesi
-        app.put('/users/admin/:id', verifyJWT, async (req, res) => {
+        app.put('/users/admin/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) }
             const options = { upsert: true }
@@ -149,13 +149,13 @@ async function run() {
         })
 
         // user ta real kina eta check kore booking order dekhabo nahole j keu amr email paile kam tamat koira debe
-        app.get('/bookings', verifyJWT, async (req, res) => {
+        app.get('/bookings', async (req, res) => {
             const email = req.query.email;
-            const decodedEmail = req.decoded.email
+            // const decodedEmail = req.decoded.email
 
-            if (email !== decodedEmail) {
-                return res.status(403).send({ message: "forbidden access" })
-            }
+            // if (email !== decodedEmail) {
+            //     return res.status(403).send({ message: "forbidden access" })
+            // }
 
             const query = { email: email }
             const bookings = await bookingCollection.find(query).toArray()
@@ -204,20 +204,26 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/doctors', verifyJWT, verifyAdmin, async (req, res) => {
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: ObjectId(id) }
+            const result = await usersCollection.deleteOne(filter)
+            res.send(result)
+        })
+        app.get('/doctors', async (req, res) => {
             const query = {}
             const result = await doctorsCollection.find(query).toArray()
             res.send(result)
         })
 
-        app.post('/doctors', verifyJWT, async (req, res) => {
+        app.post('/doctors', async (req, res) => {
             const doctors = req.body
             const result = await doctorsCollection.insertOne(doctors)
             res.send(result)
         })
 
         // doctor  k delete kortesi
-        app.delete('/doctors/:id', verifyJWT, async (req, res) => {
+        app.delete('/doctors/:id', async (req, res) => {
             const id = req.params.id
             const filter = { _id: ObjectId(id) }
             const result = await doctorsCollection.deleteOne(filter)
@@ -225,7 +231,7 @@ async function run() {
         })
 
 
-        app.post('/orders', verifyJWT, async (req, res) => {
+        app.post('/orders', async (req, res) => {
             const order = req.body;
 
             // const {service,email,address} = order;
